@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>What's For Lunch?</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #CC0000;
+    --red-bright: #FF1111;
+    --red-glow: rgba(204,0,0,0.6);
+    --red-soft: rgba(204,0,0,0.15);
+    --white: #FFFFFF;
+    --white-soft: rgba(255,255,255,0.08);
+    --white-mid: rgba(255,255,255,0.15);
+    --white-strong: rgba(255,255,255,0.92);
+    --bg: #0a0000;
+    --glass: rgba(255,255,255,0.06);
+    --glass-border: rgba(255,255,255,0.14);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    background: #0a0000;
+    font-family: 'Exo 2', sans-serif;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ── MAPLE LEAF BACKGROUND ── */
+  .maple-bg {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .maple-bg svg {
+    width: min(85vw, 85vh);
+    height: min(85vw, 85vh);
+    opacity: 0.07;
+    filter: blur(1px);
+    animation: mapleBreath 8s ease-in-out infinite;
+  }
+  @keyframes mapleBreath {
+    0%,100% { opacity: 0.07; transform: scale(1); }
+    50% { opacity: 0.11; transform: scale(1.03); }
+  }
+
+  /* ── SCAN LINES ── */
+  .scanlines {
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent,
+      transparent 3px,
+      rgba(0,0,0,0.15) 3px,
+      rgba(0,0,0,0.15) 4px
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* ── GRID OVERLAY ── */
+  .grid-overlay {
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(204,0,0,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(204,0,0,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── MAIN LAYOUT ── */
+  .app {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 480px;
+    min-height: 100vh;
+    padding: 0 16px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    width: 100%;
+    text-align: center;
+    padding: 36px 0 24px;
+    position: relative;
+  }
+  .header-tag {
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    letter-spacing: 5px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    opacity: 0.8;
+  }
+  .header h1 {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(22px, 7vw, 32px);
+    font-weight: 900;
+    color: var(--white);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    line-height: 1.1;
+    text-shadow:
+      0 0 20px var(--red-glow),
+      0 0 60px rgba(204,0,0,0.3);
+  }
+  .header h1 span {
+    color: var(--red);
+    text-shadow:
+      0 0 10px var(--red),
+      0 0 30px var(--red-glow);
+  }
+  .header-line {
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--red), transparent);
+    margin: 14px auto 0;
+    box-shadow: 0 0 8px var(--red);
+  }
+  .subtitle {
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: rgba(255,255,255,0.35);
+    text-transform: uppercase;
+    margin-top: 10px;
+  }
+
+  /* ── INSTRUCTION ── */
+  .instruction {
+    font-family: 'Exo 2', sans-serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  /* ── CARDS CONTAINER ── */
+  .cards-grid {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  /* ── OPTION CARD ── */
+  .option-card {
+    width: 100%;
+    position: relative;
+    cursor: pointer;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: transform 0.15s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .option-card:active { transform: scale(0.97); }
+
+  .card-inner {
+    width: 100%;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 20px 22px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, background 0.3s, box-shadow 0.3s;
+  }
+  .card-inner::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  }
+
+  /* shimmer sweep */
+  .card-inner::after {
+    content: '';
+    position: absolute;
+    top: -50%; left: -75%;
+    width: 50%; height: 200%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+    transform: skewX(-20deg);
+    animation: shimmer 4s ease-in-out infinite;
+  }
+  .option-card:nth-child(2) .card-inner::after { animation-delay: 1.3s; }
+  .option-card:nth-child(3) .card-inner::after { animation-delay: 2.6s; }
+  @keyframes shimmer {
+    0% { left: -75%; }
+    60%,100% { left: 125%; }
+  }
+
+  .card-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--red);
+    opacity: 0.7;
+    letter-spacing: 1px;
+    min-width: 20px;
+    text-align: center;
+  }
+
+  .card-flag {
+    font-size: 32px;
+    line-height: 1;
+    filter: drop-shadow(0 0 6px rgba(255,255,255,0.3));
+    min-width: 40px;
+    text-align: center;
+    transition: transform 0.3s;
+  }
+
+  .card-info { flex: 1; }
+  .card-cuisine {
+    font-family: 'Orbitron', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--white-strong);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .card-desc {
+    font-size: 11px;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 0.5px;
+  }
+
+  .card-arrow {
+    color: rgba(255,255,255,0.2);
+    font-size: 14px;
+    transition: color 0.3s, transform 0.3s;
+  }
+
+  /* HOVER states */
+  .option-card:hover .card-inner {
+    border-color: rgba(204,0,0,0.5);
+    background: rgba(204,0,0,0.08);
+    box-shadow: 0 0 20px rgba(204,0,0,0.2), inset 0 0 20px rgba(204,0,0,0.04);
+  }
+  .option-card:hover .card-arrow { color: var(--red); transform: translateX(3px); }
+  .option-card:hover .card-flag { transform: scale(1.15); }
+
+  /* SPINNING state */
+  .option-card.spinning .card-cuisine {
+    animation: textFlip 0.12s linear infinite;
+  }
+  @keyframes textFlip {
+    0% { opacity: 1; }
+    50% { opacity: 0.2; }
+    100% { opacity: 1; }
+  }
+
+  /* CHOSEN state */
+  .option-card.chosen .card-inner {
+    border-color: var(--red);
+    background: rgba(204,0,0,0.12);
+    box-shadow:
+      0 0 30px rgba(204,0,0,0.5),
+      0 0 80px rgba(204,0,0,0.2),
+      inset 0 0 30px rgba(204,0,0,0.06);
+  }
+  .option-card.chosen .card-cuisine {
+    color: var(--white);
+    text-shadow: 0 0 10px var(--red), 0 0 20px rgba(204,0,0,0.5);
+    animation: none;
+  }
+  .option-card.chosen .card-num { opacity: 1; font-size: 12px; }
+
+  /* DIMMED state */
+  .option-card.dimmed .card-inner {
+    opacity: 0.3;
+    filter: grayscale(0.5);
+  }
+
+  /* ── RANDOMIZE BUTTON ── */
+  .btn-wrap {
+    width: 100%;
+    margin-bottom: 14px;
+  }
+  .btn-randomize {
+    width: 100%;
+    padding: 18px 24px;
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--white);
+    background: linear-gradient(135deg, #CC0000 0%, #880000 50%, #CC0000 100%);
+    background-size: 200% 200%;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+      0 0 20px rgba(204,0,0,0.4),
+      0 4px 30px rgba(204,0,0,0.3),
+      inset 0 1px 0 rgba(255,255,255,0.2);
+    transition: box-shadow 0.3s, transform 0.15s;
+    animation: btnGlow 3s ease-in-out infinite;
+  }
+  @keyframes btnGlow {
+    0%,100% { background-position: 0% 50%; box-shadow: 0 0 20px rgba(204,0,0,0.4), 0 4px 30px rgba(204,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2); }
+    50% { background-position: 100% 50%; box-shadow: 0 0 35px rgba(204,0,0,0.7), 0 4px 50px rgba(204,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.25); }
+  }
+  .btn-randomize::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    transition: left 0.4s;
+  }
+  .btn-randomize:hover::before { left: 100%; }
+  .btn-randomize:hover { transform: translateY(-1px); box-shadow: 0 0 40px rgba(204,0,0,0.6), 0 8px 40px rgba(204,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.25); }
+  .btn-randomize:active { transform: translateY(1px); }
+  .btn-randomize:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .btn-reset {
+    width: 100%;
+    padding: 14px 24px;
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .btn-reset:hover {
+    color: rgba(255,255,255,0.7);
+    border-color: rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.04);
+  }
+
+  /* ── CONFETTI CANVAS ── */
+  #confettiCanvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  /* ── WINNER BANNER ── */
+  .winner-banner {
+    width: 100%;
+    text-align: center;
+    padding: 20px;
+    background: rgba(204,0,0,0.08);
+    border: 1px solid rgba(204,0,0,0.3);
+    border-radius: 14px;
+    margin-bottom: 20px;
+    backdrop-filter: blur(8px);
+    display: none;
+    animation: bannerIn 0.5s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .winner-banner.show { display: block; }
+  @keyframes bannerIn {
+    from { opacity: 0; transform: scale(0.8) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .winner-emoji { font-size: 36px; margin-bottom: 6px; animation: bounce 0.6s ease infinite alternate; }
+  @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-8px); } }
+  .winner-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .winner-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--white);
+    letter-spacing: 2px;
+    text-shadow: 0 0 15px var(--red), 0 0 30px rgba(204,0,0,0.4);
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: rgba(255,255,255,0.15);
+    text-transform: uppercase;
+    text-align: center;
+    padding-top: 10px;
+  }
+
+  /* ── PULSE RINGS on chosen card ── */
+  .ring {
+    position: absolute;
+    inset: -4px;
+    border-radius: 18px;
+    border: 2px solid var(--red);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .option-card.chosen .ring { animation: ringPulse 1.5s ease-out infinite; }
+  .option-card.chosen .ring:nth-child(2) { animation-delay: 0.5s; }
+  .option-card.chosen .ring:nth-child(3) { animation-delay: 1s; }
+  @keyframes ringPulse {
+    0% { transform: scale(1); opacity: 0.6; }
+    100% { transform: scale(1.06); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Maple Leaf Background -->
+<div class="maple-bg">
+  <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+    <path fill="#CC0000" d="M250,30 
+      L268,120 L320,90 L305,140 L360,130 L330,175 L390,180 L355,215 
+      L420,240 L360,250 L390,290 L330,280 L345,330 L290,305 L285,380 
+      L250,340 L215,380 L210,305 L155,330 L170,280 L110,290 L140,250 
+      L80,240 L145,215 L110,180 L170,175 L140,130 L195,140 L180,90 
+      L232,120 Z
+      M230,340 L230,470 L270,470 L270,340 Z"/>
+  </svg>
+</div>
+
+<div class="scanlines"></div>
+<div class="grid-overlay"></div>
+<canvas id="confettiCanvas"></canvas>
+
+<div class="app">
+  <header class="header">
+    <div class="header-tag">🍁 Canada &bull; Daily Selector</div>
+    <h1>What's For<br><span>Lunch?</span></h1>
+    <div class="header-line"></div>
+    <div class="subtitle">Cuisine Randomizer &bull; v2.0</div>
+  </header>
+
+  <div class="instruction">Choose your destiny — pick one</div>
+
+  <div id="winnerBanner" class="winner-banner">
+    <div class="winner-emoji" id="winnerEmoji">🎉</div>
+    <div class="winner-label">Today's Lunch</div>
+    <div class="winner-name" id="winnerName">—</div>
+  </div>
+
+  <div class="cards-grid" id="cardsGrid">
+    <!-- Cards injected by JS -->
+  </div>
+
+  <div class="btn-wrap">
+    <button class="btn-randomize" id="btnRandomize" onclick="startSpin()">
+      🎲 &nbsp; Randomize Options
+    </button>
+  </div>
+  <div class="btn-wrap">
+    <button class="btn-reset" id="btnReset" onclick="resetAll()">
+      ↺ &nbsp; Reset
+    </button>
+  </div>
+
+  <div class="footer">🍁 Made in Canada &bull; Bon Appétit</div>
+</div>
+
+<script>
+const CUISINES = [
+  { name: "Canadian",     flag: "🍁", desc: "Poutine, butter tarts, tourtière" },
+  { name: "Greek",        flag: "🇬🇷", desc: "Souvlaki, spanakopita, tzatziki" },
+  { name: "Mediterranean",flag: "🌊", desc: "Fresh mezze, olive oil, seafood" },
+  { name: "Mexican",      flag: "🇲🇽", desc: "Tacos, enchiladas, guacamole" },
+  { name: "Thai",         flag: "🇹🇭", desc: "Pad thai, green curry, spring rolls" },
+  { name: "Chinese",      flag: "🇨🇳", desc: "Dim sum, noodles, Peking duck" },
+  { name: "Brazilian",    flag: "🇧🇷", desc: "Churrasco, feijoada, açaí" },
+  { name: "Turkish",      flag: "🇹🇷", desc: "Kebabs, baklava, meze" },
+  { name: "Japanese",     flag: "🇯🇵", desc: "Sushi, ramen, tempura" },
+  { name: "Indian",       flag: "🇮🇳", desc: "Butter chicken, biryani, naan" },
+  { name: "Italian",      flag: "🇮🇹", desc: "Pasta, risotto, wood-fired pizza" },
+  { name: "Lebanese",     flag: "🇱🇧", desc: "Hummus, shawarma, kibbeh" },
+  { name: "Korean",       flag: "🇰🇷", desc: "BBQ, bibimbap, kimchi jjigae" },
+  { name: "Peruvian",     flag: "🇵🇪", desc: "Ceviche, lomo saltado, causa" },
+  { name: "Ethiopian",    flag: "🇪🇹", desc: "Injera, doro wat, lentil stew" },
+  { name: "Spanish",      flag: "🇪🇸", desc: "Tapas, paella, jamón" },
+  { name: "Vietnamese",   flag: "🇻🇳", desc: "Pho, banh mi, fresh spring rolls" },
+  { name: "Moroccan",     flag: "🇲🇦", desc: "Tagine, couscous, pastilla" },
+];
+
+let currentOptions = [];
+let spinIntervals = [];
+let hasChosen = false;
+
+function pickRandom(exclude = []) {
+  const pool = CUISINES.filter(c => !exclude.includes(c.name));
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function getThreeOptions() {
+  const a = pickRandom();
+  const b = pickRandom([a.name]);
+  const c = pickRandom([a.name, b.name]);
+  return [a, b, c];
+}
+
+function buildCard(cuisine, index) {
+  const card = document.createElement('div');
+  card.className = 'option-card';
+  card.id = `card-${index}`;
+  card.innerHTML = `
+    <div class="ring"></div>
+    <div class="ring"></div>
+    <div class="ring"></div>
+    <div class="card-inner">
+      <div class="card-num">0${index+1}</div>
+      <div class="card-flag" id="flag-${index}">${cuisine.flag}</div>
+      <div class="card-info">
+        <div class="card-cuisine" id="cuisine-${index}">${cuisine.name}</div>
+        <div class="card-desc" id="desc-${index}">${cuisine.desc}</div>
+      </div>
+      <div class="card-arrow">▶</div>
+    </div>
+  `;
+  card.addEventListener('click', () => {
+    if (!hasChosen && !card.classList.contains('spinning')) return;
+    if (hasChosen) return;
+    chooseCard(index);
+  });
+  return card;
+}
+
+function renderCards(options) {
+  const grid = document.getElementById('cardsGrid');
+  grid.innerHTML = '';
+  currentOptions = options;
+  options.forEach((cuisine, i) => {
+    grid.appendChild(buildCard(cuisine, i));
+  });
+  // enable click after render
+  setTimeout(() => {
+    document.querySelectorAll('.option-card').forEach(c => {
+      c.style.cursor = 'pointer';
+    });
+  }, 50);
+}
+
+function startSpin() {
+  if (hasChosen) return;
+  const btn = document.getElementById('btnRandomize');
+  btn.disabled = true;
+  document.getElementById('winnerBanner').classList.remove('show');
+
+  // Clear old
+  spinIntervals.forEach(clearInterval);
+  spinIntervals = [];
+
+  // Reset cards
+  document.querySelectorAll('.option-card').forEach(c => {
+    c.className = 'option-card spinning';
+  });
+
+  // Spin each card through random cuisines
+  const duration = 2000;
+  const start = Date.now();
+
+  for (let i = 0; i < 3; i++) {
+    const id = setInterval(() => {
+      const elapsed = Date.now() - start;
+      const slow = elapsed > duration * 0.6;
+      const delay = slow ? 180 : 80;
+      const r = pickRandom();
+      document.getElementById(`flag-${i}`).textContent = r.flag;
+      document.getElementById(`cuisine-${i}`).textContent = r.name;
+      document.getElementById(`desc-${i}`).textContent = r.desc;
+    }, 90 + i * 20);
+    spinIntervals.push(id);
+  }
+
+  // Stop and land on final choices
+  setTimeout(() => {
+    spinIntervals.forEach(clearInterval);
+    const options = getThreeOptions();
+    options.forEach((c, i) => {
+      document.getElementById(`flag-${i}`).textContent = c.flag;
+      document.getElementById(`cuisine-${i}`).textContent = c.name;
+      document.getElementById(`desc-${i}`).textContent = c.desc;
+    });
+    currentOptions = options;
+    document.querySelectorAll('.option-card').forEach(c => c.classList.remove('spinning'));
+    btn.disabled = false;
+    btn.textContent = '✓  Select Your Lunch';
+  }, duration);
+}
+
+function chooseCard(index) {
+  if (hasChosen) return;
+  hasChosen = true;
+
+  document.getElementById('btnRandomize').disabled = true;
+  const chosen = currentOptions[index];
+
+  document.querySelectorAll('.option-card').forEach((c, i) => {
+    c.classList.remove('spinning');
+    if (i === index) {
+      c.classList.add('chosen');
+    } else {
+      c.classList.add('dimmed');
+    }
+    c.style.cursor = 'default';
+  });
+
+  // Winner banner
+  const banner = document.getElementById('winnerBanner');
+  document.getElementById('winnerEmoji').textContent = chosen.flag;
+  document.getElementById('winnerName').textContent = chosen.name + ' Cuisine';
+  banner.classList.add('show');
+
+  // Confetti!
+  launchConfetti();
+}
+
+function resetAll() {
+  hasChosen = false;
+  spinIntervals.forEach(clearInterval);
+  spinIntervals = [];
+
+  document.getElementById('winnerBanner').classList.remove('show');
+  document.getElementById('btnRandomize').disabled = false;
+  document.getElementById('btnRandomize').innerHTML = '🎲 &nbsp; Randomize Options';
+
+  const options = getThreeOptions();
+  renderCards(options);
+
+  // Stop confetti
+  confettiActive = false;
+}
+
+// ── CONFETTI ENGINE ──
+const canvas = document.getElementById('confettiCanvas');
+const ctx = canvas.getContext('2d');
+let confettiPieces = [];
+let confettiActive = false;
+let animFrame;
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+function launchConfetti() {
+  confettiActive = true;
+  confettiPieces = [];
+  const colors = ['#CC0000','#FF3333','#FFFFFF','#FF6666','#FFD700','#FF0000'];
+
+  for (let i = 0; i < 120; i++) {
+    confettiPieces.push({
+      x: Math.random() * canvas.width,
+      y: -20 - Math.random() * 200,
+      w: 6 + Math.random() * 8,
+      h: 3 + Math.random() * 5,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      rot: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.2,
+      vx: (Math.random() - 0.5) * 4,
+      vy: 3 + Math.random() * 5,
+      opacity: 1,
+    });
+  }
+  cancelAnimationFrame(animFrame);
+  animateConfetti();
+
+  setTimeout(() => { confettiActive = false; }, 3500);
+}
+
+function animateConfetti() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (!confettiActive && confettiPieces.every(p => p.y > canvas.height)) return;
+
+  confettiPieces.forEach(p => {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.rot += p.rotSpeed;
+    p.vy += 0.08;
+    if (p.y > canvas.height * 0.7) p.opacity -= 0.02;
+
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rot);
+    ctx.globalAlpha = Math.max(0, p.opacity);
+    ctx.fillStyle = p.color;
+
+    // maple leaf shape for some
+    if (p.w > 11) {
+      ctx.beginPath();
+      ctx.arc(0, 0, p.w/2, 0, Math.PI*2);
+      ctx.fill();
+    } else {
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+    }
+    ctx.restore();
+  });
+
+  confettiPieces = confettiPieces.filter(p => p.opacity > 0);
+  animFrame = requestAnimationFrame(animateConfetti);
+}
+
+// ── INIT ──
+renderCards(getThreeOptions());
+</script>
+</body>
+</html>
