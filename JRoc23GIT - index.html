@@ -1,1 +1,414 @@
-index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project ORO</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:      #050505;
+      --deep:       #0a0a0a;
+      --panel:      #111111;
+      --border:     #1f1f1f;
+      --orange:     #ff6a00;
+      --orange-dim: #c94e00;
+      --gold:       #d4a017;
+      --gold-light: #f5d060;
+      --gold-shine: #ffe680;
+      --text:       #e8e0d0;
+      --muted:      #6b6355;
+      --glow-o:     rgba(255,106,0,0.35);
+      --glow-g:     rgba(212,160,23,0.4);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--text);
+      font-family: 'Rajdhani', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── BACKGROUND GRID ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(212,160,23,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(212,160,23,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── SCANLINE OVERLAY ── */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.08) 2px,
+        rgba(0,0,0,0.08) 4px
+      );
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      text-align: center;
+      padding: 80px 0 56px;
+      position: relative;
+    }
+
+    .hero-eyebrow {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.35em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.2s forwards;
+    }
+
+    .hero-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(3rem, 12vw, 7rem);
+      font-weight: 900;
+      line-height: 0.95;
+      letter-spacing: -0.01em;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, var(--gold-light) 0%, var(--orange) 40%, var(--gold-shine) 70%, var(--gold) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 40px var(--glow-g)) drop-shadow(0 0 80px var(--glow-o));
+      opacity: 0;
+      animation: fadeUp 0.7s 0.4s forwards;
+    }
+
+    /* Animated shimmer on title */
+    .hero-title::after {
+      content: 'PROJECT ORO';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(105deg, transparent 40%, rgba(255,230,128,0.55) 50%, transparent 60%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      background-size: 200% 100%;
+      animation: shimmer 3s 1.5s infinite;
+    }
+    .hero-title-wrap { position: relative; display: inline-block; }
+
+    .hero-sub {
+      font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+      font-weight: 300;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-top: 20px;
+      text-transform: uppercase;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.65s forwards;
+    }
+
+    /* Decorative line */
+    .hero-line {
+      width: 120px;
+      height: 2px;
+      margin: 36px auto 0;
+      background: linear-gradient(90deg, transparent, var(--gold), var(--orange), transparent);
+      opacity: 0;
+      animation: fadeUp 0.5s 0.85s forwards;
+    }
+
+    /* Corner brackets */
+    .bracket {
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      opacity: 0.5;
+    }
+    .bracket--tl { top: 60px; left: 0; border-top: 1px solid var(--gold); border-left: 1px solid var(--gold); }
+    .bracket--tr { top: 60px; right: 0; border-top: 1px solid var(--gold); border-right: 1px solid var(--gold); }
+    .bracket--bl { bottom: 40px; left: 0; border-bottom: 1px solid var(--gold); border-left: 1px solid var(--gold); }
+    .bracket--br { bottom: 40px; right: 0; border-bottom: 1px solid var(--gold); border-right: 1px solid var(--gold); }
+
+    /* ── DIVIDER ── */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 48px;
+      opacity: 0;
+      animation: fadeUp 0.5s 1s forwards;
+    }
+    .divider-line { flex: 1; height: 1px; background: var(--border); }
+    .divider-diamond {
+      width: 8px;
+      height: 8px;
+      background: var(--gold);
+      transform: rotate(45deg);
+      box-shadow: 0 0 8px var(--glow-g);
+    }
+    .divider-label {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    /* ── GRID ── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 16px;
+    }
+
+    /* ── PROJECT BUTTON ── */
+    .proj-btn {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      padding: 32px 16px 28px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.3s, transform 0.25s;
+      opacity: 0;
+      animation: fadeUp 0.5s forwards;
+    }
+
+    /* staggered delays */
+    .proj-btn:nth-child(1)  { animation-delay: 1.05s; }
+    .proj-btn:nth-child(2)  { animation-delay: 1.12s; }
+    .proj-btn:nth-child(3)  { animation-delay: 1.19s; }
+    .proj-btn:nth-child(4)  { animation-delay: 1.26s; }
+    .proj-btn:nth-child(5)  { animation-delay: 1.33s; }
+    .proj-btn:nth-child(6)  { animation-delay: 1.40s; }
+    .proj-btn:nth-child(7)  { animation-delay: 1.47s; }
+    .proj-btn:nth-child(8)  { animation-delay: 1.54s; }
+    .proj-btn:nth-child(9)  { animation-delay: 1.61s; }
+    .proj-btn:nth-child(10) { animation-delay: 1.68s; }
+
+    /* top accent bar */
+    .proj-btn::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--orange), var(--gold));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.35s ease;
+    }
+
+    /* glow background */
+    .proj-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, var(--glow-g) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.35s;
+    }
+
+    .proj-btn:hover {
+      border-color: var(--gold);
+      transform: translateY(-4px);
+    }
+    .proj-btn:hover::before { transform: scaleX(1); }
+    .proj-btn:hover::after  { opacity: 1; }
+
+    .proj-btn:hover .proj-num {
+      -webkit-text-fill-color: transparent;
+      background: linear-gradient(135deg, var(--gold-light), var(--orange));
+      -webkit-background-clip: text;
+      background-clip: text;
+      filter: drop-shadow(0 0 10px var(--glow-o));
+    }
+
+    .proj-num {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: var(--text);
+      line-height: 1;
+      transition: all 0.3s;
+      position: relative;
+      z-index: 1;
+    }
+
+    .proj-label {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-top: 8px;
+      position: relative;
+      z-index: 1;
+      transition: color 0.3s;
+    }
+    .proj-btn:hover .proj-label { color: var(--gold); }
+
+    /* corner pip */
+    .proj-pip {
+      position: absolute;
+      bottom: 8px;
+      right: 10px;
+      width: 4px;
+      height: 4px;
+      background: var(--orange);
+      border-radius: 50%;
+      opacity: 0.5;
+      transition: opacity 0.3s, background 0.3s;
+    }
+    .proj-btn:hover .proj-pip { opacity: 1; background: var(--gold-shine); box-shadow: 0 0 6px var(--gold-shine); }
+
+    /* ── FOOTER ── */
+    .footer {
+      margin-top: 72px;
+      text-align: center;
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      color: var(--muted);
+      text-transform: uppercase;
+      opacity: 0;
+      animation: fadeUp 0.5s 1.9s forwards;
+    }
+    .footer span { color: var(--gold); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes shimmer {
+      0%   { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    /* ── MOBILE ── */
+    @media (max-width: 480px) {
+      .hero { padding: 60px 0 44px; }
+      .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .proj-btn { padding: 26px 12px 22px; }
+      .proj-num { font-size: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="bracket bracket--tl"></div>
+      <div class="bracket bracket--tr"></div>
+      <div class="bracket bracket--bl"></div>
+      <div class="bracket bracket--br"></div>
+
+      <p class="hero-eyebrow">Mic Check 23 &nbsp;/&nbsp; CVC Projects</p>
+      <div class="hero-title-wrap">
+        <h1 class="hero-title">Project&nbsp;ORO</h1>
+      </div>
+      <p class="hero-sub">Select a project module to continue</p>
+      <div class="hero-line"></div>
+    </header>
+
+    <!-- DIVIDER -->
+    <div class="divider">
+      <div class="divider-line"></div>
+      <div class="divider-diamond"></div>
+      <span class="divider-label">Project Index</span>
+      <div class="divider-diamond"></div>
+      <div class="divider-line"></div>
+    </div>
+
+    <!-- BUTTON GRID -->
+    <main class="grid" role="main">
+      <a class="proj-btn" href="page1.html">
+        <span class="proj-num">01 Mic Check</span>
+        <span class="proj-label">Project</span>
+        <span class="proj-pip"></span>
+      </a>
+      <a class="proj-btn" href="page2.html">
+        <span class="proj-num">02 Mic Check 23</span>
+        <span class="proj-label">Project</span>
+        <span class="proj-pip"></span>
+      </a>
+      <a class="proj-btn" href="page3.html">
+        <span class="proj-num">03</span>
+        <span class="proj-label">Project</span>
+        <span class="proj-pip"></span>
+      </a>
+      <a class="proj-btn" href="page4.html">
+        <span class="proj-num">04</span>
+        <span class="proj-label">Project</span>
+        <span class="proj-pip"></span>
+      </a>
+      <a class="proj-btn" href="page5.html">
+        <span class="proj-num">05</span>
+        <span class="proj-label">Project</span>
+        <span class="proj-pip"></span>
+      </a>
+      <a class="proj-btn" href="page6.html">
+        <span class="proj-num">06</span>
+        <span class="proj-label">Project</span>
+        <span class="proj-pip"></span>
+      </a>
+      <a class="proj-btn" href="page7.html">
+        <span class="proj-num">07</span>
+        <span class="proj-label">Project</span>
+        <span class="proj-pip"></span>
+      </a>
+      <a class="proj-btn" href="page8.html">
+        <span class="proj-num">08</span>
+        <span class="proj-label">Project</span>
+        <span class="proj-pip"></span>
+      </a>
+      <a class="proj-btn" href="page9.html">
+        <span class="proj-num">1234567890 Really</span>
+        <span class="proj-label">Project</span>
+        <span class="proj-pip"></span>
+      </a>
+      <a class="proj-btn" href="page10.html">
+        <span class="proj-num">10</span>
+        <span class="proj-label">Project</span>
+        <span class="proj-pip"></span>
+      </a>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <span>Project ORO</span> &nbsp;·&nbsp; Built by CVC &nbsp;·&nbsp; All rights reserved
+    </footer>
+
+  </div>
+</body>
+</html>
