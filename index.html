@@ -1,414 +1,1210 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Project ORO</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PROJECT ORO | Projoro.ca</title>
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,900&display=swap" rel="stylesheet">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    :root {
-      --black:      #050505;
-      --deep:       #0a0a0a;
-      --panel:      #111111;
-      --border:     #1f1f1f;
-      --orange:     #ff6a00;
-      --orange-dim: #c94e00;
-      --gold:       #d4a017;
-      --gold-light: #f5d060;
-      --gold-shine: #ffe680;
-      --text:       #e8e0d0;
-      --muted:      #6b6355;
-      --glow-o:     rgba(255,106,0,0.35);
-      --glow-g:     rgba(212,160,23,0.4);
+    /* ═══════════════════════════════════════════════════════
+       1. DESIGN TOKENS
+    ═══════════════════════════════════════════════════════ */
+    [data-theme="dark"] {
+      --bg:           #030303;
+      --bg2:          #070707;
+      --surface:      #0f0f0f;
+      --border:       rgba(255, 235, 35, 0.12);
+      --border-mid:   rgba(255, 235, 35, 0.28);
+      --txt:          #f0f0f0;
+      --txt-soft:     rgba(240, 240, 240, 0.9);
+      --txt-dim:      rgb(0, 225, 255);
+      --accent:       #FFEB23;
+      --accent-glow:  rgba(255, 235, 35, 0.42);
+      --accent-soft:  rgb(134, 227, 20);
+      --orange:       #d77655;
+      --orange-glow:  rgba(215, 118, 85, 0.38);
+      --nav-bg:       rgba(3, 3, 3, 0.88);
+      --scanline:     rgba(255, 255, 255, 0.013);
+    }
+
+    [data-theme="light"] {
+      --bg:           #f0ece0;
+      --bg2:          #e8e3d5;
+      --surface:      #faf8f2;
+      --border:       rgba(0, 0, 0, 0.1);
+      --border-mid:   rgba(0, 0, 0, 0.22);
+      --txt:          #0c0c0c;
+      --txt-soft:     rgba(12, 12, 12, 0.72);
+      --txt-dim:      rgba(77, 255, 0, 0.898);
+      --accent:       #b89800;
+      --accent-glow:  rgba(184, 152, 0, 0.38);
+      --accent-soft:  rgba(184, 152, 0, 0.12);
+      --orange:       #c05535;
+      --orange-glow:  rgba(192, 85, 53, 0.3);
+      --nav-bg:       rgba(240, 236, 224, 0.92);
+      --scanline:     rgba(0, 0, 0, 0.014);
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       2. RESET & BASE
+    ═══════════════════════════════════════════════════════ */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
     html { scroll-behavior: smooth; }
 
     body {
-      background: var(--black);
-      color: var(--text);
-      font-family: 'Rajdhani', sans-serif;
-      min-height: 100vh;
+      font-family: 'Exo 2', sans-serif;
+      background: var(--bg);
+      color: var(--txt);
       overflow-x: hidden;
+      transition: background 0.5s ease, color 0.5s ease;
     }
 
-    /* ── BACKGROUND GRID ── */
+    /* CRT scanline overlay */
     body::before {
       content: '';
       position: fixed;
       inset: 0;
-      background-image:
-        linear-gradient(rgba(212,160,23,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(212,160,23,0.04) 1px, transparent 1px);
-      background-size: 60px 60px;
+      z-index: 9998;
       pointer-events: none;
-      z-index: 0;
-    }
-
-    /* ── SCANLINE OVERLAY ── */
-    body::after {
-      content: '';
-      position: fixed;
-      inset: 0;
       background: repeating-linear-gradient(
-        to bottom,
-        transparent,
-        transparent 2px,
-        rgba(0,0,0,0.08) 2px,
-        rgba(0,0,0,0.08) 4px
+        0deg,
+        var(--scanline) 0px,
+        var(--scanline) 1px,
+        transparent 1px,
+        transparent 3px
       );
-      pointer-events: none;
-      z-index: 0;
     }
 
-    .wrapper {
-      position: relative;
-      z-index: 1;
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 0 24px 80px;
-    }
-
-    /* ── HERO ── */
-    .hero {
-      text-align: center;
-      padding: 80px 0 56px;
-      position: relative;
-    }
-
-    .hero-eyebrow {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.35em;
-      color: var(--gold);
-      text-transform: uppercase;
-      margin-bottom: 20px;
-      opacity: 0;
-      animation: fadeUp 0.6s 0.2s forwards;
-    }
-
-    .hero-title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: clamp(3rem, 12vw, 7rem);
-      font-weight: 900;
-      line-height: 0.95;
-      letter-spacing: -0.01em;
-      text-transform: uppercase;
-      background: linear-gradient(135deg, var(--gold-light) 0%, var(--orange) 40%, var(--gold-shine) 70%, var(--gold) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      filter: drop-shadow(0 0 40px var(--glow-g)) drop-shadow(0 0 80px var(--glow-o));
-      opacity: 0;
-      animation: fadeUp 0.7s 0.4s forwards;
-    }
-
-    /* Animated shimmer on title */
-    .hero-title::after {
-      content: 'PROJECT ORO';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(105deg, transparent 40%, rgba(255,230,128,0.55) 50%, transparent 60%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      background-size: 200% 100%;
-      animation: shimmer 3s 1.5s infinite;
-    }
-    .hero-title-wrap { position: relative; display: inline-block; }
-
-    .hero-sub {
-      font-size: clamp(0.9rem, 2.5vw, 1.1rem);
-      font-weight: 300;
-      letter-spacing: 0.12em;
-      color: var(--muted);
-      margin-top: 20px;
-      text-transform: uppercase;
-      opacity: 0;
-      animation: fadeUp 0.6s 0.65s forwards;
-    }
-
-    /* Decorative line */
-    .hero-line {
-      width: 120px;
-      height: 2px;
-      margin: 36px auto 0;
-      background: linear-gradient(90deg, transparent, var(--gold), var(--orange), transparent);
-      opacity: 0;
-      animation: fadeUp 0.5s 0.85s forwards;
-    }
-
-    /* Corner brackets */
-    .bracket {
-      position: absolute;
-      width: 28px;
-      height: 28px;
-      opacity: 0.5;
-    }
-    .bracket--tl { top: 60px; left: 0; border-top: 1px solid var(--gold); border-left: 1px solid var(--gold); }
-    .bracket--tr { top: 60px; right: 0; border-top: 1px solid var(--gold); border-right: 1px solid var(--gold); }
-    .bracket--bl { bottom: 40px; left: 0; border-bottom: 1px solid var(--gold); border-left: 1px solid var(--gold); }
-    .bracket--br { bottom: 40px; right: 0; border-bottom: 1px solid var(--gold); border-right: 1px solid var(--gold); }
-
-    /* ── DIVIDER ── */
-    .divider {
+    /* ═══════════════════════════════════════════════════════
+       3. NAVIGATION
+    ═══════════════════════════════════════════════════════ */
+    .nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 999;
       display: flex;
       align-items: center;
-      gap: 16px;
-      margin-bottom: 48px;
-      opacity: 0;
-      animation: fadeUp 0.5s 1s forwards;
-    }
-    .divider-line { flex: 1; height: 1px; background: var(--border); }
-    .divider-diamond {
-      width: 8px;
-      height: 8px;
-      background: var(--gold);
-      transform: rotate(45deg);
-      box-shadow: 0 0 8px var(--glow-g);
-    }
-    .divider-label {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 0.65rem;
-      letter-spacing: 0.3em;
-      color: var(--muted);
-      text-transform: uppercase;
+      justify-content: space-between;
+      padding: 0.8rem 2.5rem;
+      background: var(--nav-bg);
+      backdrop-filter: blur(20px) saturate(160%);
+      transition: background 0.5s ease;
     }
 
-    /* ── GRID ── */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 16px;
-    }
-
-    /* ── PROJECT BUTTON ── */
-    .proj-btn {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      padding: 32px 16px 28px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: border-color 0.3s, transform 0.25s;
-      opacity: 0;
-      animation: fadeUp 0.5s forwards;
-    }
-
-    /* staggered delays */
-    .proj-btn:nth-child(1)  { animation-delay: 1.05s; }
-    .proj-btn:nth-child(2)  { animation-delay: 1.12s; }
-    .proj-btn:nth-child(3)  { animation-delay: 1.19s; }
-    .proj-btn:nth-child(4)  { animation-delay: 1.26s; }
-    .proj-btn:nth-child(5)  { animation-delay: 1.33s; }
-    .proj-btn:nth-child(6)  { animation-delay: 1.40s; }
-    .proj-btn:nth-child(7)  { animation-delay: 1.47s; }
-    .proj-btn:nth-child(8)  { animation-delay: 1.54s; }
-    .proj-btn:nth-child(9)  { animation-delay: 1.61s; }
-    .proj-btn:nth-child(10) { animation-delay: 1.68s; }
-
-    /* top accent bar */
-    .proj-btn::before {
+    /* Gradient divider — nav bottom edge */
+    .nav::after {
       content: '';
       position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, var(--orange), var(--gold));
+      bottom: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--orange) 18%,
+        var(--accent) 50%,
+        var(--orange) 82%,
+        transparent 100%
+      );
+      opacity: 0.7;
+    }
+
+    .nav-logo {
+      font-size: 1.05rem;
+      font-weight: 900;
+      letter-spacing: 0.38em;
+      text-transform: uppercase;
+      color: var(--accent);
+      text-shadow: 0 0 16px var(--accent-glow);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .nav-contact {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--txt-soft);
+      text-decoration: none;
+      padding-bottom: 2px;
+      position: relative;
+      transition: color 0.3s;
+    }
+    .nav-contact::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, var(--orange), var(--accent));
       transform: scaleX(0);
       transform-origin: left;
       transition: transform 0.35s ease;
     }
+    .nav-contact:hover { color: var(--accent); }
+    .nav-contact:hover::after { transform: scaleX(1); }
 
-    /* glow background */
+    /* Theme Toggle */
+    .toggle-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+    }
+    .toggle-label {
+      font-size: 0.58rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--txt-soft);
+      font-weight: 600;
+    }
+    .toggle {
+      width: 42px;
+      height: 22px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      cursor: pointer;
+      position: relative;
+      transition: background 0.3s;
+    }
+    .toggle::after {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent);
+      top: 2px;
+      left: 2px;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+    [data-theme="light"] .toggle::after { transform: translateX(20px); }
+
+    /* ═══════════════════════════════════════════════════════
+       4. HERO  (~70 vh so first project button peeks below)
+    ═══════════════════════════════════════════════════════ */
+    .hero {
+      min-height: 70vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;       /* title anchored near top */
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      padding: 5.5rem 2rem 2rem;         /* top pad clears nav; rest is tight */
+    }
+
+    /* Canvas: particles + data streams */
+    #heroCanvas {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    /* Gradient orbs */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      pointer-events: none;
+    }
+    .orb-1 {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(255,235,35,0.1), transparent 70%);
+      top: -20%; left: -12%;
+      animation: floatA 14s ease-in-out infinite alternate;
+    }
+    .orb-2 {
+      width: 480px; height: 480px;
+      background: radial-gradient(circle, rgba(215,118,85,0.09), transparent 70%);
+      bottom: -15%; right: -8%;
+      animation: floatB 17s ease-in-out infinite alternate;
+    }
+    .orb-3 {
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(255,235,35,0.06), transparent 70%);
+      top: 50%; left: 55%;
+      animation: floatC 10s ease-in-out infinite alternate;
+    }
+    @keyframes floatA { to { transform: translate(50px, 35px) scale(1.1); } }
+    @keyframes floatB { to { transform: translate(-35px, -50px) scale(1.08); } }
+    @keyframes floatC { to { transform: translate(-20px, 20px) scale(1.12); } }
+
+    /* Drifting grid */
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,235,35,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,235,35,0.025) 1px, transparent 1px);
+      background-size: 64px 64px;
+      animation: gridDrift 30s linear infinite;
+    }
+    @keyframes gridDrift { to { background-position: 0 64px; } }
+
+    /* Thick animated scan line */
+    .scan {
+      position: absolute;
+      left: 0; right: 0;
+      height: 8px;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255,235,35,0.05) 8%,
+        rgba(255,235,35,0.55) 38%,
+        rgba(215,118,85,0.42) 58%,
+        rgba(255,235,35,0.55) 72%,
+        rgba(255,235,35,0.05) 92%,
+        transparent 100%
+      );
+      filter: blur(2px);
+      animation: scanDown 4s linear infinite;
+      pointer-events: none;
+      z-index: 3;
+    }
+    @keyframes scanDown {
+      0%   { top: -4px;  opacity: 0; }
+      3%   { opacity: 1; }
+      97%  { opacity: 0.8; }
+      100% { top: 100%;  opacity: 0; }
+    }
+
+    /* ── Hero content stack ── */
+    .hero-content {
+      position: relative;
+      z-index: 4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.1rem;
+      width: 100%;
+      max-width: 860px;
+    }
+
+    /* Terminal line */
+    .hero-terminal {
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      color: var(--orange);
+      font-family: 'Exo 2', monospace;
+      opacity: 0;
+      animation: riseIn 0.8s 0.2s forwards;
+      align-self: flex-start;
+    }
+    .hero-terminal::before { content: '> '; color: var(--accent); }
+    .cursor {
+      display: inline-block;
+      width: 8px; height: 0.85em;
+      background: var(--accent);
+      margin-left: 2px;
+      vertical-align: middle;
+      animation: blink 0.75s step-end infinite;
+    }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+    /* Main title */
+    .hero-title {
+      font-size: clamp(3.2rem, 12vw, 9.5rem);
+      font-weight: 900;
+      text-transform: uppercase;
+      line-height: 0.88;
+      letter-spacing: 0.06em;
+      opacity: 0;
+      animation: riseIn 0.9s 0.45s forwards;
+    }
+    .glow-proj {
+      color: var(--accent);
+      text-shadow:
+        0 0 35px rgba(255,235,35,0.5),
+        0 0 85px rgba(255,235,35,0.2);
+      animation: goldPulse 3.5s ease-in-out infinite alternate;
+    }
+    .dim-ect { color: var(--txt); }
+    .glow-oro {
+      display: block;
+      color: var(--accent);
+      text-shadow:
+        0 0 35px rgba(255,235,35,0.5),
+        0 0 85px rgba(255,235,35,0.2),
+        0 0 160px rgba(255,235,35,0.08);
+      animation: goldPulse 3.5s ease-in-out infinite alternate;
+    }
+    @keyframes goldPulse {
+      from { text-shadow: 0 0 30px rgba(255,235,35,0.35), 0 0 70px rgba(255,235,35,0.12); }
+      to   { text-shadow: 0 0 70px rgba(255,235,35,0.7),  0 0 140px rgba(255,235,35,0.28), 0 0 220px rgba(255,235,35,0.08); }
+    }
+
+    /* ── Image placeholder with gradient border ── */
+    .hero-image-wrap {
+      width: 100%;
+      max-width: 640px;
+      padding: 2px;                      /* space for the gradient border */
+      border-radius: 10px;
+      background: linear-gradient(
+        135deg,
+        var(--orange) 0%,
+        var(--accent) 40%,
+        var(--orange) 70%,
+        var(--accent) 100%
+      );
+      box-shadow:
+        0 0 24px var(--accent-glow),
+        0 0 60px rgba(255,235,35,0.08);
+      animation: borderPulse 4s ease-in-out infinite alternate;
+      opacity: 0;
+      animation: riseIn 0.9s 0.65s forwards, borderPulse 4s 1.5s ease-in-out infinite alternate;
+      position: relative;
+    }
+    @keyframes borderPulse {
+      from { box-shadow: 0 0 20px var(--accent-glow), 0 0 50px rgba(255,235,35,0.06); }
+      to   { box-shadow: 0 0 40px var(--accent-glow), 0 0 90px rgba(255,235,35,0.14); }
+    }
+
+    .hero-image-inner {
+      background: var(--surface);
+      border-radius: 9px;
+      width: 100%;
+      /* Aspect ratio flexible — image fills naturally; placeholder uses padding trick */
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 120px;
+    }
+
+    /* Actual image tag — swap src when ready */
+    .hero-image-inner img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: contain;
+    }
+
+    /* Placeholder shown when no real image is loaded */
+    .hero-img-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      color: var(--txt-soft);
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+    }
+    .hero-img-placeholder svg {
+      width: 32px;
+      height: 32px;
+      stroke: var(--accent);
+      opacity: 0.5;
+    }
+
+    /* ── Rotating slogan ── */
+    .hero-slogan {
+      font-size: clamp(1rem, 2.8vw, 1.45rem);
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--txt);                 /* bright — no grey */
+      text-shadow: 0 0 20px var(--accent-glow);
+      line-height: 1.3;
+      max-width: 680px;
+      opacity: 0;
+      animation: riseIn 0.9s 0.85s forwards;
+      min-height: 2.4em;               /* prevents layout shift during swap */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── Short description ── */
+    .hero-desc {
+      font-size: clamp(0.78rem, 1.6vw, 0.92rem);
+      font-weight: 300;
+      line-height: 1.85;
+      color: var(--txt-soft);
+      max-width: 580px;
+      letter-spacing: 0.04em;
+      opacity: 0;
+      animation: riseIn 0.9s 1.05s forwards;
+    }
+
+    /* CTA button */
+    .hero-cta {
+      display: inline-block;
+      padding: 0.75rem 2.2rem;
+      border: 1px solid var(--accent);
+      border-radius: 40px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--accent);
+      text-decoration: none;
+      background: transparent;
+      position: relative;
+      overflow: hidden;
+      transition: color 0.4s, box-shadow 0.4s;
+      opacity: 0;
+      animation: riseIn 0.9s 1.2s forwards;
+    }
+    .hero-cta::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--accent);
+      border-radius: 40px;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: -1;
+    }
+    .hero-cta:hover { color: #000; box-shadow: 0 0 36px var(--accent-glow); }
+    .hero-cta:hover::before { transform: scaleX(1); }
+
+    @keyframes riseIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Scroll hint */
+    .scroll-hint {
+      position: absolute;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      opacity: 0;
+      animation: riseIn 0.8s 1.4s forwards;
+    }
+    .scroll-hint span {
+      font-size: 0.52rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--txt-soft);
+    }
+    .scroll-line {
+      width: 1px; height: 36px;
+      background: linear-gradient(to bottom, var(--accent), transparent);
+      animation: linePulse 2s ease-in-out infinite;
+    }
+    @keyframes linePulse {
+      0%, 100% { opacity: 0.25; transform: scaleY(0.85); }
+      50%      { opacity: 1;    transform: scaleY(1); }
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       5. GRADIENT SECTION DIVIDER
+    ═══════════════════════════════════════════════════════ */
+    .grad-divider {
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--orange)  18%,
+        var(--accent)  50%,
+        var(--orange)  82%,
+        transparent   100%
+      );
+      opacity: 0.55;
+      position: relative;
+    }
+    .grad-divider::after {
+      content: '';
+      display: block;
+      width: 55%;
+      height: 10px;
+      margin: 0 auto;
+      background: linear-gradient(90deg, transparent, var(--accent-soft), transparent);
+      filter: blur(7px);
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       6. PROJECTS SECTION
+    ═══════════════════════════════════════════════════════ */
+    .projects {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 3rem 2rem 4rem;
+    }
+
+    .section-kicker {
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.55em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 0.7rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .section-kicker::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, var(--orange), transparent);
+    }
+
+    .section-heading {
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 1.8rem;
+      color: var(--txt);
+    }
+    .section-heading span { color: var(--accent); }
+
+    /* Project list */
+    .project-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .proj-item {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 0.65rem;
+    }
+
+    /* Capsule button */
+    .proj-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.1rem 1.8rem;
+      border-radius: 50px;
+      border: 1px solid var(--border);
+      background: transparent;
+      cursor: pointer;
+      text-decoration: none;
+      color: var(--txt);
+      font-family: 'Exo 2', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      position: relative;
+      overflow: hidden;
+      transition:
+        border-color 0.35s,
+        box-shadow 0.35s,
+        transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+        background 0.35s;
+    }
+
+    /* Shimmer sweep */
+    .proj-btn::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -160%;
+      width: 75%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,235,35,0.18),
+        rgba(255,235,35,0.08),
+        transparent
+      );
+      transform: skewX(-22deg);
+      transition: left 0.6s ease;
+    }
+
+    /* Radial inner glow */
     .proj-btn::after {
       content: '';
       position: absolute;
       inset: 0;
-      background: radial-gradient(ellipse at center, var(--glow-g) 0%, transparent 70%);
+      background: radial-gradient(
+        ellipse at 50% 50%,
+        rgba(255,235,35,0.1) 0%,
+        transparent 65%
+      );
+      border-radius: 50px;
       opacity: 0;
-      transition: opacity 0.35s;
+      transition: opacity 0.4s;
     }
 
     .proj-btn:hover {
-      border-color: var(--gold);
-      transform: translateY(-4px);
+      border-color: var(--accent);
+      background: rgba(255,235,35,0.04);
+      box-shadow:
+        0 0 22px var(--accent-glow),
+        0 0 55px rgba(255,235,35,0.18),
+        0 0 95px rgba(255,235,35,0.07),
+        inset 0 0 20px rgba(255,235,35,0.07);
+      transform: translateX(6px);
     }
-    .proj-btn:hover::before { transform: scaleX(1); }
+    .proj-btn:hover::before { left: 160%; }
     .proj-btn:hover::after  { opacity: 1; }
 
-    .proj-btn:hover .proj-num {
-      -webkit-text-fill-color: transparent;
-      background: linear-gradient(135deg, var(--gold-light), var(--orange));
-      -webkit-background-clip: text;
-      background-clip: text;
-      filter: drop-shadow(0 0 10px var(--glow-o));
-    }
-
     .proj-num {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 2.2rem;
-      font-weight: 900;
-      color: var(--text);
-      line-height: 1;
-      transition: all 0.3s;
+      font-size: 0.62rem;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--accent);
+      min-width: 2.2rem;
       position: relative;
       z-index: 1;
     }
 
     .proj-label {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 0.6rem;
-      letter-spacing: 0.3em;
-      color: var(--muted);
-      text-transform: uppercase;
-      margin-top: 8px;
+      flex: 1;
+      text-align: center;
       position: relative;
       z-index: 1;
+    }
+
+    .proj-arrow {
+      font-size: 0.9rem;
+      color: var(--accent);
+      opacity: 0;
+      transform: translateX(-6px);
+      transition: all 0.3s;
+      position: relative;
+      z-index: 1;
+    }
+    .proj-btn:hover .proj-arrow {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* Caption below each button */
+    .proj-caption {
+      font-size: 0.7rem;
+      font-weight: 300;
+      color: var(--txt-soft);           /* soft white, no grey */
+      letter-spacing: 0.06em;
+      line-height: 1.55;
+      padding: 0.4rem 1.8rem 0.1rem;
+      font-style: italic;
+      border-left: 2px solid var(--border);
+      margin-left: 1.4rem;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       7. FOOTER
+    ═══════════════════════════════════════════════════════ */
+    .footer-divider {
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--orange)  18%,
+        var(--accent)  50%,
+        var(--orange)  82%,
+        transparent   100%
+      );
+      opacity: 0.55;
+    }
+    .footer-divider::before {
+      content: '';
+      display: block;
+      width: 50%;
+      height: 10px;
+      margin: 0 auto;
+      background: linear-gradient(90deg, transparent, var(--accent-soft), transparent);
+      filter: blur(8px);
+      transform: translateY(-4px);
+    }
+
+    footer {
+      background: linear-gradient(to bottom, var(--bg2), var(--bg));
+      padding: 3rem 2.5rem 2rem;
+    }
+
+    .footer-inner {
+      max-width: 820px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .footer-logo {
+      font-size: 1.5rem;
+      font-weight: 900;
+      letter-spacing: 0.38em;
+      text-transform: uppercase;
+      color: var(--accent);
+      text-shadow: 0 0 22px var(--accent-glow);
+    }
+
+    /* Gradient underline beneath logo */
+    .footer-logo-rule {
+      width: 100px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--orange), var(--accent), var(--orange), transparent);
+      margin-top: -0.8rem;
+    }
+
+    .footer-nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+    }
+    .footer-nav a {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--txt-soft);
+      text-decoration: none;
+      position: relative;
       transition: color 0.3s;
     }
-    .proj-btn:hover .proj-label { color: var(--gold); }
-
-    /* corner pip */
-    .proj-pip {
+    .footer-nav a::after {
+      content: '';
       position: absolute;
-      bottom: 8px;
-      right: 10px;
-      width: 4px;
-      height: 4px;
-      background: var(--orange);
+      bottom: -2px; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, var(--orange), var(--accent));
+      transform: scaleX(0);
+      transition: transform 0.3s;
+    }
+    .footer-nav a:hover { color: var(--accent); }
+    .footer-nav a:hover::after { transform: scaleX(1); }
+
+    .footer-socials { display: flex; gap: 0.8rem; }
+
+    .soc {
+      width: 36px; height: 36px;
+      border: 1px solid var(--border);
       border-radius: 50%;
-      opacity: 0.5;
-      transition: opacity 0.3s, background 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--txt-soft);
+      text-decoration: none;
+      font-size: 0.6rem;
+      font-weight: 900;
+      transition: all 0.3s;
     }
-    .proj-btn:hover .proj-pip { opacity: 1; background: var(--gold-shine); box-shadow: 0 0 6px var(--gold-shine); }
+    .soc:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: 0 0 14px var(--accent-glow);
+    }
 
-    /* ── FOOTER ── */
-    .footer {
-      margin-top: 72px;
-      text-align: center;
-      font-size: 0.65rem;
-      letter-spacing: 0.25em;
-      color: var(--muted);
+    .footer-email {
+      font-size: 0.78rem;
+      color: var(--txt-soft);
+      letter-spacing: 0.08em;
+    }
+    .footer-email a {
+      color: var(--orange);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .footer-email a:hover { color: var(--accent); }
+
+    .footer-copy {
+      font-size: 0.58rem;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
-      opacity: 0;
-      animation: fadeUp 0.5s 1.9s forwards;
-    }
-    .footer span { color: var(--gold); }
-
-    /* ── ANIMATIONS ── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(18px); }
-      to   { opacity: 1; transform: translateY(0); }
+      color: var(--txt-dim);
     }
 
-    @keyframes shimmer {
-      0%   { background-position: -200% 0; }
-      100% { background-position: 200% 0; }
+    /* ═══════════════════════════════════════════════════════
+       8. RESPONSIVE — MOBILE
+    ═══════════════════════════════════════════════════════ */
+    @media (max-width: 640px) {
+      .nav          { padding: 0.7rem 1.2rem; }
+      .nav-logo     { font-size: 0.82rem; letter-spacing: 0.2em; }
+      .hero         { padding: 4.5rem 1.2rem 2rem; min-height: 70vh; }
+      .hero-content { gap: 0.9rem; }
+      .projects     { padding: 2.5rem 1.2rem 3rem; }
+      .proj-btn     { padding: 0.95rem 1.3rem; font-size: 0.8rem; }
+      .proj-caption { padding: 0.4rem 1.3rem 0.1rem; margin-left: 1rem; }
+      .section-heading { font-size: 1.8rem; }
+      footer        { padding: 2.5rem 1.5rem 1.8rem; }
     }
 
-    /* ── MOBILE ── */
-    @media (max-width: 480px) {
-      .hero { padding: 60px 0 44px; }
-      .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-      .proj-btn { padding: 26px 12px 22px; }
-      .proj-num { font-size: 1.8rem; }
+    @media (max-width: 380px) {
+      .nav-logo     { font-size: 0.72rem; }
+      .hero-title   { font-size: 3rem; }
+      .hero-slogan  { font-size: 0.9rem; letter-spacing: 0.15em; }
     }
+
   </style>
 </head>
 <body>
-  <div class="wrapper">
 
-    <!-- HERO -->
-    <header class="hero">
-      <div class="bracket bracket--tl"></div>
-      <div class="bracket bracket--tr"></div>
-      <div class="bracket bracket--bl"></div>
-      <div class="bracket bracket--br"></div>
-
-      <p class="hero-eyebrow">Mic Check 23 &nbsp;/&nbsp; CVC Projects</p>
-      <div class="hero-title-wrap">
-        <h1 class="hero-title">Project&nbsp;ORO</h1>
+  <!-- ═══ NAV ═══════════════════════════════════════════ -->
+  <nav class="nav">
+    <div class="nav-logo">Project ORO</div>
+    <div class="nav-right">
+      <a href="#contact" class="nav-contact">Contact 1</a>
+      <a href="#contact" class="nav-contact">Contact 2</a>
+      <a href="#contact" class="nav-contact">Contact</a>
+      <div class="toggle-wrap">
+        <span class="toggle-label" id="modeLabel">Dark/Lite</span>
+        <button class="toggle" id="themeToggle" aria-label="Toggle light/dark mode"></button>
       </div>
-      <p class="hero-sub">Select a project module to continue</p>
-      <div class="hero-line"></div>
-    </header>
-
-    <!-- DIVIDER -->
-    <div class="divider">
-      <div class="divider-line"></div>
-      <div class="divider-diamond"></div>
-      <span class="divider-label">Project Index</span>
-      <div class="divider-diamond"></div>
-      <div class="divider-line"></div>
     </div>
+  </nav>
 
-    <!-- BUTTON GRID -->
-    <main class="grid" role="main">
-      <a class="proj-btn" href="page1.html">
-        <span class="proj-num">01 Mic Check</span>
-        <span class="proj-label">Project</span>
-        <span class="proj-pip"></span>
-      </a>
-      <a class="proj-btn" href="page2.html">
-        <span class="proj-num">02 Mic Check 23</span>
-        <span class="proj-label">Project</span>
-        <span class="proj-pip"></span>
-      </a>
-      <a class="proj-btn" href="page3.html">
-        <span class="proj-num">03</span>
-        <span class="proj-label">Project</span>
-        <span class="proj-pip"></span>
-      </a>
-      <a class="proj-btn" href="page4.html">
-        <span class="proj-num">04</span>
-        <span class="proj-label">Project</span>
-        <span class="proj-pip"></span>
-      </a>
-      <a class="proj-btn" href="page5.html">
-        <span class="proj-num">05</span>
-        <span class="proj-label">Project</span>
-        <span class="proj-pip"></span>
-      </a>
-      <a class="proj-btn" href="page6.html">
-        <span class="proj-num">06</span>
-        <span class="proj-label">Project</span>
-        <span class="proj-pip"></span>
-      </a>
-      <a class="proj-btn" href="page7.html">
-        <span class="proj-num">07</span>
-        <span class="proj-label">Project</span>
-        <span class="proj-pip"></span>
-      </a>
-      <a class="proj-btn" href="page8.html">
-        <span class="proj-num">08</span>
-        <span class="proj-label">Project</span>
-        <span class="proj-pip"></span>
-      </a>
-      <a class="proj-btn" href="page9.html">
-        <span class="proj-num">1234567890 Really</span>
-        <span class="proj-label">Project</span>
-        <span class="proj-pip"></span>
-      </a>
-      <a class="proj-btn" href="page10.html">
-        <span class="proj-num">10</span>
-        <span class="proj-label">Project</span>
-        <span class="proj-pip"></span>
-      </a>
-    </main>
+  <!-- ═══ HERO ══════════════════════════════════════════ -->
+  <section class="hero">
+    <canvas id="heroCanvas"></canvas>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="hero-grid"></div>
+    <div class="scan"></div>
 
-    <!-- FOOTER -->
-    <footer class="footer">
-      <span>Project ORO</span> &nbsp;·&nbsp; Built by CVC &nbsp;·&nbsp; All rights reserved
-    </footer>
+    <div class="hero-content">
 
-  </div>
+      <!-- 1. Terminal line -->
+      <div class="hero-terminal">V:\JRoc23\Encrypted\Project_ORO\projoro.html_<span class="cursor"></span></div>
+
+      <!-- 2. Main title -->
+      <h1 class="hero-title">
+        <span class="glow-proj">PROJ</span><span class="dim-ect">ECT</span>
+        <span class="glow-oro">ORO</span>
+      </h1>
+
+      <!-- 3. Placeholder image with gradient border -->
+      <div class="hero-image-wrap" id="heroImageWrap">
+        <div class="hero-image-inner">
+          <!--
+            TO USE YOUR OWN IMAGE:
+            1. Replace the placeholder div below with:
+               <img src="YOUR_IMAGE_PATH" alt="Project ORO" />
+            2. The wrapper auto-scales to any image dimension.
+          -->
+          <div class="hero-img-placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21 15 16 10 5 21"/>
+            </svg>
+            Your Logo / Image Here
+          </div>
+          <!-- Minimum visible height for the placeholder state -->
+          <div style="height:110px;"></div>
+        </div>
+      </div>
+
+      <!-- 4. Rotating slogan -->
+      <p class="hero-slogan" id="heroSlogan"></p>
+      <div class="footer-logo-rule"></div>
+
+      <!-- 5. Short description -->
+      <p class="hero-desc">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua, ut enim ad minim veniam quis nostrud exercitation. This is a brief introduction to the portfolio, highlighting key skills and areas of expertise in a concise and engaging way.
+      </p>
+
+      <!-- 6. CTA -->
+      <!--
+      <a href="#projects" class="hero-cta">Explore Projects</a>
+      </div> 
+      -->
+      <br>
+      <br>
+    <div class="scroll-hint">
+      <!-- <span>Scroll</span> -->
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- Gradient divider -->
+  <div class="grad-divider"></div>
+
+  <!-- ═══ PROJECTS ══════════════════════════════════════ -->
+  <section class="projects" id="projects">
+    
+    <h2 class="section-heading">Projects</h2>
+    
+
+    <div class="project-list">
+
+      <!--
+        TO ADD MORE PROJECTS: copy one .proj-item block,
+        increment the number, update the href, label, and caption.
+      -->
+
+    <div class="section-kicker">Project 1</div>
+    <br>
+    <div class="footer-logo-rule"></div>
+    <br>
+
+      <div class="proj-item">
+        <a href="#" class="proj-btn">
+          <span class="proj-num">01</span>
+          <span class="proj-label">Project 1</span>
+          <span class="proj-arrow">→</span>
+        </a>
+        <p class="proj-caption">Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod.</p>
+      </div>
+      <br>
+
+    <div class="section-kicker">Project 2</div>
+    <br>
+    <div class="footer-logo-rule"></div>
+    <br>
+
+      <div class="proj-item">
+        <a href="#" class="proj-btn">
+          <span class="proj-num">02</span>
+          <span class="proj-label">Project 2</span>
+          <span class="proj-arrow">→</span>
+        </a>
+        <p class="proj-caption">Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
+      </div>
+
+
+    <div class="section-kicker">Project XXX</div>
+    <br>
+    <div class="footer-logo-rule"></div>
+    <br>
+
+      <div class="proj-item">
+        <a href="#" class="proj-btn">
+          <span class="proj-num">03</span>
+          <span class="proj-label">Project 3</span>
+          <span class="proj-arrow">→</span>
+        </a>
+        <p class="proj-caption">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.</p>
+      </div>
+
+      <div class="proj-item">
+        <a href="#" class="proj-btn">
+          <span class="proj-num">04</span>
+          <span class="proj-label">Project 4</span>
+          <span class="proj-arrow">→</span>
+        </a>
+        <p class="proj-caption">Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.</p>
+      </div>
+
+      <div class="proj-item">
+        <a href="#" class="proj-btn">
+          <span class="proj-num">05</span>
+          <span class="proj-label">Project 5</span>
+          <span class="proj-arrow">→</span>
+        </a>
+        <p class="proj-caption">Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.</p>
+      </div>
+
+      <div class="proj-item">
+        <a href="#" class="proj-btn">
+          <span class="proj-num">06</span>
+          <span class="proj-label">Project 6</span>
+          <span class="proj-arrow">→</span>
+        </a>
+        <p class="proj-caption">Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet consectetur.</p>
+      </div>
+
+      <div class="proj-item">
+        <a href="#" class="proj-btn">
+          <span class="proj-num">07</span>
+          <span class="proj-label">Project 7</span>
+          <span class="proj-arrow">→</span>
+        </a>
+        <p class="proj-caption">Ut labore et dolore magnam aliquam quaerat voluptatem incidunt ut labore.</p>
+      </div>
+
+      <div class="proj-item">
+        <a href="#" class="proj-btn">
+          <span class="proj-num">08</span>
+          <span class="proj-label">Project 8</span>
+          <span class="proj-arrow">→</span>
+        </a>
+        <p class="proj-caption">Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam.</p>
+      </div>
+
+      <div class="proj-item">
+        <a href="#" class="proj-btn">
+          <span class="proj-num">09</span>
+          <span class="proj-label">Project 9</span>
+          <span class="proj-arrow">→</span>
+        </a>
+        <p class="proj-caption">At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis.</p>
+      </div>
+
+      <div class="proj-item">
+        <a href="#" class="proj-btn">
+          <span class="proj-num">10</span>
+          <span class="proj-label">Project 10</span>
+          <span class="proj-arrow">→</span>
+        </a>
+        <p class="proj-caption">Nam libero tempore cum soluta nobis est eligendi optio cumque nihil impedit.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Gradient divider -->
+  <div class="footer-divider"></div>
+
+  <!-- ═══ FOOTER ════════════════════════════════════════ -->
+  <footer id="contact">
+    <div class="footer-inner">
+      <div class="footer-logo">Project ORO</div>
+      <div class="footer-logo-rule"></div>
+
+      <nav class="footer-nav">
+        <a href="#projects">Projects</a>
+        <a href="#contact">Contact</a>
+        <a href="#projects">Projects</a>
+        <a href="#contact">Contact</a>
+      </nav>
+
+      <div class="footer-socials">
+        <a href="#" class="soc" aria-label="X / Twitter">𝕏</a>
+        <a href="#" class="soc" aria-label="LinkedIn">in</a>
+        <a href="#" class="soc" aria-label="Instagram">IG</a>
+        <a href="#" class="soc" aria-label="YouTube">▶</a>
+        <a href="#" class="soc" aria-label="X / Twitter">𝕏</a>
+        <a href="#" class="soc" aria-label="LinkedIn">in</a>
+        <a href="#" class="soc" aria-label="Instagram">IG</a>
+        <a href="#" class="soc" aria-label="YouTube">▶</a>
+      </div>
+
+      <div class="footer-email">
+        <a href="mailto:hello@projectoro.com">JROC23 @  PROJORO.ca</a>
+      </div>
+
+        <div class="footer-logo-rule"></div>
+
+      <p class="footer-copy">© 2026 Project ORO — All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- ═══ SCRIPTS ═══════════════════════════════════════ -->
+  <script>
+
+    /* ── 1. THEME TOGGLE ─────────────────────────────── */
+    const themeToggle = document.getElementById('themeToggle');
+    const modeLabel   = document.getElementById('modeLabel');
+    const htmlEl      = document.documentElement;
+
+    themeToggle.addEventListener('click', () => {
+      const isDark = htmlEl.dataset.theme === 'dark';
+      htmlEl.dataset.theme = isDark ? 'light' : 'dark';
+      modeLabel.textContent = isDark ? 'Light' : 'Dark';
+      buildCanvas();
+    });
+
+    /* ── 2. ROTATING SLOGANS ─────────────────────────── */
+    /*
+      TO ADD MORE SLOGANS: append additional strings to this array.
+      One is picked at random on every page load.
+    */
+    const SLOGANS = [
+      'Forging the future — one venture at a time',
+      'Where bold ideas become breakthrough realities',
+      'RECURSIVE ORIGIN', 'RADICAL ORDER', 'RESONANT ORBIT', 'RATIONAL ORDER', 'REFINED OUTPUT',
+      'Engineering tomorrow — built on vision, driven by purpose',
+    ];
+
+    const sloganEl = document.getElementById('heroSlogan');
+    sloganEl.textContent = SLOGANS[Math.floor(Math.random() * SLOGANS.length)];
+
+    /* ── 3. HERO CANVAS — particles + data streams ───── */
+    function buildCanvas() {
+      const canvas = document.getElementById('heroCanvas');
+      if (!canvas) return;
+      const ctx   = canvas.getContext('2d');
+      const dark  = htmlEl.dataset.theme === 'dark';
+
+      canvas.width  = canvas.offsetWidth  || window.innerWidth;
+      canvas.height = canvas.offsetHeight || window.innerHeight;
+
+      const GOLD   = dark ? 'rgba(255,235,35,'  : 'rgba(184,152,0,';
+      const ORANGE = dark ? 'rgba(215,118,85,'  : 'rgba(192,85,53,';
+
+      /* Floating particles */
+      const count = Math.max(35, Math.floor((canvas.width * canvas.height) / 12000));
+      const pts   = Array.from({ length: count }, () => ({
+        x:  Math.random() * canvas.width,
+        y:  Math.random() * canvas.height,
+        r:  Math.random() * 1.3 + 0.2,
+        vx: (Math.random() - 0.5) * 0.17,
+        vy: (Math.random() - 0.5) * 0.21,
+        c:  Math.random() > 0.55 ? GOLD : ORANGE,
+        a:  Math.random() * 0.42 + 0.1,
+      }));
+
+      /* Falling data-stream columns */
+      const colW  = 32;
+      const cols  = Math.ceil(canvas.width / colW);
+      const drops = Array.from({ length: cols }, () => Math.random() * canvas.height);
+      const CHARS = 'ORO01ORO10';
+
+      if (window.__oro_raf) cancelAnimationFrame(window.__oro_raf);
+
+      function frame() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        /* Data streams */
+        ctx.font = '10px "Exo 2", monospace';
+        for (let i = 0; i < cols; i++) {
+          const ch     = CHARS[Math.floor(Math.random() * CHARS.length)];
+          const color  = i % 4 === 0 ? GOLD : ORANGE;
+          const alpha  = i % 3 === 0 ? '0.055)' : '0.03)';
+          ctx.fillStyle = color + alpha.replace(')', '');
+          ctx.fillText(ch, i * colW, drops[i]);
+          drops[i] += 20;
+          if (drops[i] > canvas.height) drops[i] = -18;
+        }
+
+        /* Particles */
+        pts.forEach(p => {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = p.c + p.a + ')';
+          ctx.fill();
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.x < 0) p.x = canvas.width;
+          if (p.x > canvas.width)  p.x = 0;
+          if (p.y < 0) p.y = canvas.height;
+          if (p.y > canvas.height) p.y = 0;
+        });
+
+        window.__oro_raf = requestAnimationFrame(frame);
+      }
+
+      frame();
+    }
+
+    buildCanvas();
+
+    /* Debounced resize handler */
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(buildCanvas, 220);
+    });
+
+  </script>
 </body>
 </html>
